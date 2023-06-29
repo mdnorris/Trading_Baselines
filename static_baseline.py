@@ -29,7 +29,7 @@ low_15m = sb_rank["15m_average"].nsmallest(5)
 high_15m = sb_rank["15m_average"].nlargest(4)
 low_DA = sb_rank["DA_average"].nsmallest(5)
 high_DA = sb_rank["DA_average"].nlargest(4)
-
+# TODO: fix tuples and put them into dfs
 low_5m_sb = tuple(low_5m.index.sort_values().tolist())
 high_5m_sb = tuple(high_5m.index.sort_values().tolist())
 low_15m_sb = tuple(low_15m.index.sort_values().tolist())
