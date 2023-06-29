@@ -4,6 +4,7 @@ import pandas as pd
 logging = lg.getLogger(__name__)
 # TODO: comments throughout the file
 sb_hr = pd.read_csv("C:/Users/norri/PycharmProjects/Baselines/static_baseline.csv")
+da_hr = pd.read_csv("C:/Users/norri/PycharmProjects/Baselines/da_1hr_lmp.csv")
 
 sb_hr = sb_hr[["date", "RTD_5min_LMP", "FMM_15min_LMP", "DA_60min_LMP", "HE"]]
 sb_hr["hour"] = sb_hr["HE"]
@@ -23,16 +24,49 @@ sb_rank = sb_hr.groupby(["HE"])[
         "hour": "first",
     }
 )
-low_5m = sb_rank["5m_average"].nsmallest(5)
-high_5m = sb_rank["5m_average"].nlargest(4)
-low_15m = sb_rank["15m_average"].nsmallest(5)
-high_15m = sb_rank["15m_average"].nlargest(4)
-low_DA = sb_rank["DA_average"].nsmallest(5)
-high_DA = sb_rank["DA_average"].nlargest(4)
-# TODO: fix tuples and put them into dfs
-low_5m_sb = tuple(low_5m.index.sort_values().tolist())
-high_5m_sb = tuple(high_5m.index.sort_values().tolist())
-low_15m_sb = tuple(low_15m.index.sort_values().tolist())
-high_15m_sb = tuple(high_15m.index.sort_values().tolist())
-low_DA_sb = tuple(low_DA.index.sort_values().tolist())
-high_DA_sb = tuple(high_DA.index.sort_values().tolist())
+
+low_5m = pd.DataFrame(columns=["Hour", "5m_average"])
+low_5m["5m_average"] = sb_rank["5m_average"].nsmallest(5)
+low_5m["Hour"] = low_5m.index
+low_5m.sort_values(inplace=True, by=["Hour"])
+
+high_5m = pd.DataFrame(columns=["Hour", "5m_average"])
+high_5m['5m_average'] = sb_rank["5m_average"].nlargest(4)
+high_5m["Hour"] = high_5m.index
+high_5m.sort_values(inplace=True, by=["Hour"])
+
+low_15m = pd.DataFrame(columns=["Hour", "15m_average"])
+low_15m['15m_average'] = sb_rank["15m_average"].nsmallest(5)
+low_15m["Hour"] = low_15m.index
+low_15m.sort_values(inplace=True, by=["Hour"])
+
+high_15m = pd.DataFrame(columns=["Hour", "15m_average"])
+high_15m["15m_average"] = sb_rank["15m_average"].nlargest(4)
+high_15m["Hour"] = high_15m.index
+high_15m.sort_values(inplace=True, by=["Hour"])
+
+low_DA = pd.DataFrame(columns=["Hour", "DA_average"])
+low_DA["DA_average"] = sb_rank["DA_average"].nsmallest(5)
+low_DA["Hour"] = low_DA.index
+low_DA.sort_values(inplace=True, by=["Hour"])
+
+high_DA = pd.DataFrame(columns=["Hour", "DA_average"])
+high_DA["DA_average"] = sb_rank["DA_average"].nlargest(4)
+high_DA["Hour"] = high_DA.index
+high_DA.sort_values(inplace=True, by=["Hour"])
+
+da_hr[["Date", "HMS"]] = da_hr["Datetime"].str.split("T", expand=True)
+da_hr['Hour'] = da_hr['HMS'].str[:2]
+
+da_hr["Hour"] = da_hr["Hour"].astype(int)
+da_hr['da_lmp_ave'] = da_hr.groupby("Hour")["da_1hr_lmp ($/MWh)"].mean()
+
+da_hr_low = pd.DataFrame(columns=["Hour", "da_lmp_ave"])
+da_hr_low['da_lmp_ave'] = da_hr['da_lmp_ave'].nsmallest(5)
+da_hr_low["Hour"] = da_hr_low.index
+da_hr_low.sort_values(inplace=True, by=["Hour"])
+
+da_hr_high = pd.DataFrame(columns=["Hour", "da_lmp_ave"])
+da_hr_high['da_lmp_ave'] = da_hr['da_lmp_ave'].nlargest(4)
+da_hr_high["Hour"] = da_hr_high.index
+da_hr_high.sort_values(inplace=True, by=["Hour"])
