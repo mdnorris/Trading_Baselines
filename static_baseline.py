@@ -1,6 +1,7 @@
 import logging as lg
 import pandas as pd
-import datetime as dt
+from zoneinfo import ZoneInfo
+from datetime import datetime, timedelta
 
 # trained on rt_15
 # adjust timezone
@@ -21,7 +22,8 @@ df["Hour"] = df["Hour"].astype(int)
 df['15min_lmp'] = round(df['15min_lmp'], 2)
 
 df.drop(columns=["Datetime", "HMS", "Date"], inplace=True, index=1)
-
+dt = datetime.strptime(["Hour"],'%Y-%m-%d')
+datetime.dst(df["Datetime"])
 df = df.groupby(["Hour"])[["15min_lmp"]].mean().reset_index()
 
 
@@ -38,3 +40,5 @@ df_high["Hour"] = df_high.index
 df_high.sort_values(inplace=True, by=["Hour"])
 
 static_high = df_high
+
+
