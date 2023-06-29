@@ -2,6 +2,10 @@ import logging as lg
 import pandas as pd
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
+from scalene import scalene_profiler
+
+# Turn profiling on
+scalene_profiler.start()
 
 # trained on rt_15
 # adjust timezone
@@ -42,3 +46,5 @@ df_high.sort_values(inplace=True, by=["Hour"])
 static_high = df_high
 
 
+# Turn profiling off
+scalene_profiler.stop()
