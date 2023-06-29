@@ -1,72 +1,40 @@
 import logging as lg
 import pandas as pd
+import datetime as dt
+
+# trained on rt_15
+# adjust timezone
+# Ask ryan about timezone if needed
+# take a look at current settlement model
+# ask for three years of data
+# this is only for picking MW
 
 logging = lg.getLogger(__name__)
 # TODO: comments throughout the file
-sb_hr = pd.read_csv("C:/Users/norri/PycharmProjects/Baselines/static_baseline.csv")
-da_hr = pd.read_csv("C:/Users/norri/PycharmProjects/Baselines/da_1hr_lmp.csv")
 
-sb_hr = sb_hr[["date", "RTD_5min_LMP", "FMM_15min_LMP", "DA_60min_LMP", "HE"]]
-sb_hr["hour"] = sb_hr["HE"]
+df = pd.read_csv("C:/Users/norri/PycharmProjects/Baselines/rt_15_lmp.csv")
 
-sb_hr["5m_average"] = sb_hr.groupby("HE")["RTD_5min_LMP"].transform("mean")
-sb_hr["15m_average"] = sb_hr.groupby("HE")["FMM_15min_LMP"].transform("mean")
-sb_hr["DA_average"] = sb_hr.groupby("HE")["DA_60min_LMP"].transform("mean")
+df.rename(columns={'rt_15min_lmp ($/MWh)': '15min_lmp'}, inplace=True)
+df[["Date", "HMS"]] = df["Datetime"].str.split("T", expand=True)
+df['Hour'] = df['HMS'].str[:2]
+df["Hour"] = df["Hour"].astype(int)
+df['15min_lmp'] = round(df['15min_lmp'], 2)
 
-sb_hr = sb_hr[["HE", "5m_average", "15m_average", "DA_average", "hour"]]
-sb_rank = sb_hr.groupby(["HE"])[
-    ["5m_average", "15m_average", "DA_average", "hour"]
-].agg(
-    {
-        "5m_average": "first",
-        "15m_average": "first",
-        "DA_average": "first",
-        "hour": "first",
-    }
-)
+df.drop(columns=["Datetime", "HMS", "Date"], inplace=True, index=1)
 
-low_5m = pd.DataFrame(columns=["Hour", "5m_average"])
-low_5m["5m_average"] = sb_rank["5m_average"].nsmallest(5)
-low_5m["Hour"] = low_5m.index
-low_5m.sort_values(inplace=True, by=["Hour"])
+df = df.groupby(["Hour"])[["15min_lmp"]].mean().reset_index()
 
-high_5m = pd.DataFrame(columns=["Hour", "5m_average"])
-high_5m['5m_average'] = sb_rank["5m_average"].nlargest(4)
-high_5m["Hour"] = high_5m.index
-high_5m.sort_values(inplace=True, by=["Hour"])
 
-low_15m = pd.DataFrame(columns=["Hour", "15m_average"])
-low_15m['15m_average'] = sb_rank["15m_average"].nsmallest(5)
-low_15m["Hour"] = low_15m.index
-low_15m.sort_values(inplace=True, by=["Hour"])
+df_low = pd.DataFrame(columns=["Hour", "rt_lmp_ave"])
+df_low['rt_lmp_ave'] = df['15min_lmp'].nsmallest(5)
+df_low["Hour"] = df_low.index
+df_low.sort_values(inplace=True, by=["Hour"])
 
-high_15m = pd.DataFrame(columns=["Hour", "15m_average"])
-high_15m["15m_average"] = sb_rank["15m_average"].nlargest(4)
-high_15m["Hour"] = high_15m.index
-high_15m.sort_values(inplace=True, by=["Hour"])
+static_low = df_low
 
-low_DA = pd.DataFrame(columns=["Hour", "DA_average"])
-low_DA["DA_average"] = sb_rank["DA_average"].nsmallest(5)
-low_DA["Hour"] = low_DA.index
-low_DA.sort_values(inplace=True, by=["Hour"])
+df_high = pd.DataFrame(columns=["Hour", "rt_lmp_ave"])
+df_high['rt_lmp_ave'] = df['15min_lmp'].nlargest(4)
+df_high["Hour"] = df_high.index
+df_high.sort_values(inplace=True, by=["Hour"])
 
-high_DA = pd.DataFrame(columns=["Hour", "DA_average"])
-high_DA["DA_average"] = sb_rank["DA_average"].nlargest(4)
-high_DA["Hour"] = high_DA.index
-high_DA.sort_values(inplace=True, by=["Hour"])
-
-da_hr[["Date", "HMS"]] = da_hr["Datetime"].str.split("T", expand=True)
-da_hr['Hour'] = da_hr['HMS'].str[:2]
-
-da_hr["Hour"] = da_hr["Hour"].astype(int)
-da_hr['da_lmp_ave'] = da_hr.groupby("Hour")["da_1hr_lmp ($/MWh)"].mean()
-
-da_hr_low = pd.DataFrame(columns=["Hour", "da_lmp_ave"])
-da_hr_low['da_lmp_ave'] = da_hr['da_lmp_ave'].nsmallest(5)
-da_hr_low["Hour"] = da_hr_low.index
-da_hr_low.sort_values(inplace=True, by=["Hour"])
-
-da_hr_high = pd.DataFrame(columns=["Hour", "da_lmp_ave"])
-da_hr_high['da_lmp_ave'] = da_hr['da_lmp_ave'].nlargest(4)
-da_hr_high["Hour"] = da_hr_high.index
-da_hr_high.sort_values(inplace=True, by=["Hour"])
+static_high = df_high
