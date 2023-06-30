@@ -1,9 +1,6 @@
-import logging as lg
 import pandas as pd
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
-
-logging = lg.getLogger(__name__)
 
 # trained on rt_15
 # adjust timezone
@@ -15,7 +12,7 @@ logging = lg.getLogger(__name__)
 # TODO: comments throughout the file
 
 df = pd.read_csv("C:/Users/norri/PycharmProjects/Baselines/rt_15_lmp.csv")
-
+dsadfg
 df.rename(columns={'rt_15min_lmp ($/MWh)': '15min_lmp'}, inplace=True)
 df[["Date", "HMS"]] = df["Datetime"].str.split("T", expand=True)
 df['Hour'] = df['HMS'].str[:2]
@@ -25,7 +22,6 @@ df['15min_lmp'] = round(df['15min_lmp'], 2)
 df.drop(columns=["Datetime", "HMS", "Date"], inplace=True, index=1)
 
 df = df.groupby(["Hour"])[["15min_lmp"]].mean().reset_index()
-
 
 df_low = pd.DataFrame(columns=["Hour", "rt_lmp_ave"])
 df_low['rt_lmp_ave'] = df['15min_lmp'].nsmallest(5)
