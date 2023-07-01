@@ -2,6 +2,10 @@ import numpy as np
 import pandas as pd
 import pytz
 
+# This was created from Blythe 110 data and had two inputs: Datetime and
+# rt_15min_lmp ($/MWh). Ideally the inputs will be the following, but it is
+# prepared to take in the original data.
+
 # There should be three inputs to the model: Hour, DA_Prices, and RT_Prices
 # Hours should be 0-23. DA_Prices should be full, but if it can be run with
 # partial RT_Prices
