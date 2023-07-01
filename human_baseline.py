@@ -53,10 +53,10 @@ if "Hour" not in df.columns:
 # of the RT_Prices for each hour of the day and sort them from lowest to
 # highest. It will then create a schedule that will charge the battery
 df = (
-    df.groupby(["Hour"])[["DA"]]
+    df.groupby(["Hour"])[["DA_Prices"]]
     .mean()
     .reset_index()
-    .sort_values(by=["DA"])
+    .sort_values(by=["DA_Prices"])
 )
 df["RT_Prices"] = rt_prices
 
