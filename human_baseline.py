@@ -3,7 +3,7 @@ import pandas as pd
 import pytz
 
 # This was created from Blythe 110 data and had two inputs: Datetime and
-# rt_15min_lmp ($/MWh). Ideally the inputs will be the following, but it is
+# DA data. Ideally the inputs will be the following, but it is
 # prepared to take in the original data.
 
 # There should be three inputs to the model: Hour, DA_Prices, and RT_Prices
@@ -53,10 +53,10 @@ if "Hour" not in df.columns:
 # of the RT_Prices for each hour of the day and sort them from lowest to
 # highest. It will then create a schedule that will charge the battery
 df = (
-    df.groupby(["Hour"])[["rt_15min_lmp ($/MWh)"]]
+    df.groupby(["Hour"])[["DA"]]
     .mean()
     .reset_index()
-    .sort_values(by=["rt_15min_lmp ($/MWh)"])
+    .sort_values(by=["DA"])
 )
 df["RT_Prices"] = rt_prices
 
