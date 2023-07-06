@@ -25,6 +25,7 @@ col_names = df.columns
 if "RT_Prices" in df.columns:
     rt_prices = df["RT_Prices"].values
 
+
 # This function is only needed if the Datetime column is in the original UTC
 # timezone with the hours, minutes, and seconds included. It will calculate
 # the hour of the day and convert the timezone to US/Pacific
